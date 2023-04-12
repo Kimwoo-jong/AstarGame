@@ -2,41 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum ObjectType
+public enum TileType
 {
     None,
-    Player,
-    Enemy,
-    Item
+    Player = 40,
+    Enemy = 100,
+    Item = 1000
 }
 
 public class Tile : MonoBehaviour
 {
-    public Vector2 gridWorldSize;                       //그리드의 크기
-    public Color color = Color.white;                   //기즈모의 색상
-    public float nodeRadius;                            //노드의 크기
+    public int ID { get; set; }                                         //타일의 ID
+    public bool isWalkable { get; set; }                                //걸을 수 있는 곳인지 여부
 
-    float nodeDiameter;
+    public int gridSizeX { get; set; }
+    public int gridSizeY { get; set; }                                  //그리드 기준 좌표
 
-    public GameObject[] prefabsList;                    //맵에 깔아둘 타일 프리팹 배열
-
-    public int ID { get; set; }                         //타일의 ID
-    public bool isWalkable;                             //걸을 수 있는 곳인지 여부
-
-    public int gridSizeX, gridSizeY;                    //그리드 기준 좌표
-
-    [HideInInspector] public SpriteRenderer spriteRenderer;               //스프라이트 렌더러
-    [HideInInspector] public ObjectType objectType = ObjectType.None;     //오브젝트의 타입
-
-    [HideInInspector] public Player onPlayer { get; set; }                //플레이어
-    [HideInInspector] public Player onEnemy { get; set; }                 //상대
+    private TileType tileType;                                          //오브젝트의 타입
+    
+    [HideInInspector] public SpriteRenderer spriteRenderer;
+    [HideInInspector] public Player onPlayer { get; set; }              //플레이어
+    [HideInInspector] public Player onEnemy { get; set; }               //상대
 
     public int fCost { get; set; }
     public int gCost { get; set; }
     public int hCost { get; set; }
 
-    public Tile nextTile { get; set; }                                    //부모노드를 담아두기 위함
+    public Tile nextTile { get; set; }                                  //부모노드를 담아두기 위함
 
     private void Awake()
     {
@@ -49,6 +41,7 @@ public class Tile : MonoBehaviour
                 isWalkable = false;
                 break;
         }
+
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 }

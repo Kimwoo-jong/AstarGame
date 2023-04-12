@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - WalkableTile
+  - NonWalkableTile
   layers:
   - Default
   - TransparentFX
@@ -40,4 +42,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 624589011
+    locked: 0
+  - name: Effect
+    uniqueID: 45459631
+    locked: 0
+  - name: Player
+    uniqueID: 665743045
     locked: 0

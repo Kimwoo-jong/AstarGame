@@ -29,5 +29,5 @@ public class PlayerInfo : MonoBehaviour
     //이동 가능한 타일의 수
     public int movableTileCount { get; set; }
     //플레이어 이름
-    public string name { get; set; }
+    public string _name { get; set; }
 }
