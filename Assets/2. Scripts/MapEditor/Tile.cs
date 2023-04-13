@@ -2,46 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileType
-{
-    None,
-    Player = 40,
-    Enemy = 100,
-    Item = 1000
-}
+public enum OnObject { NONE, PLAYER, ENEMY, ITEM }
 
-public class Tile : MonoBehaviour
-{
-    public int ID { get; set; }                                         //타일의 ID
-    public bool isWalkable { get; set; }                                //걸을 수 있는 곳인지 여부
+public class Tile : MonoBehaviour {
 
-    public int gridSizeX { get; set; }
-    public int gridSizeY { get; set; }                                  //그리드 기준 좌표
+    //타일 고유 id
+    public int ID { get; set; }
 
-    private TileType tileType;                                          //오브젝트의 타입
-    
-    [HideInInspector] public SpriteRenderer spriteRenderer;
-    [HideInInspector] public Player onPlayer { get; set; }              //플레이어
-    [HideInInspector] public Player onEnemy { get; set; }               //상대
+    public bool Walkable { get; set; }
 
-    public int fCost { get; set; }
-    public int gCost { get; set; }
-    public int hCost { get; set; }
+    //tiles 기준 index
+    public int tileX { get; set; }
+    public int tileY { get; set; }
 
-    public Tile nextTile { get; set; }                                  //부모노드를 담아두기 위함
+    //tile사이즈 (월드좌표기준 크기)
+    public float TileSize { get; set; }
+        
+    [HideInInspector] public SpriteRenderer spRenderer;
+
+    //타일 위 오브젝트 상태
+    [HideInInspector] public OnObject onObject = OnObject.NONE;
+    [HideInInspector] public Player OnPlayer { get; set; }
+    [HideInInspector] public Player OnEnemy { get; set; }
+
+    //astar
+    public int fCost { get; set; }                              //g + h (제일 낮은 것 부터 길찾기 검색)
+    public int gCost { get; set; }                              //gCost(현재 닫힌 목록에 있는 타일과의 거리)
+    public int hCost { get; set; }                              //hCost(목적지 까지의 거리 [장애물 고려 X])
+
+    public Tile NextTile { get; set; }                      //astar에서 부모타일 담아두기용
 
     private void Awake()
     {
         switch (this.gameObject.tag)
         {
             case "WalkableTile":
-                isWalkable = true;
+                Walkable = true;
                 break;
             case "NonWalkableTile":
-                isWalkable = false;
+                Walkable = false;
                 break;
         }
-
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        spRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 }

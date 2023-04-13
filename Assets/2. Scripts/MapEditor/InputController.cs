@@ -38,7 +38,7 @@ public class InputController : MonoBehaviour
         tilePrefabs = new Dictionary<int, GameObject>();
         tileButtons = new List<Button>();
         //Resources/Tiles 폴더에 있는 모든 프리팹을 가져와서 저장
-        GameObject[] resourceTiles = Resources.LoadAll<GameObject>("Tiles");
+        GameObject[] resourceTiles = Resources.LoadAll<GameObject>("TileImage");
 
         foreach(GameObject obj in resourceTiles)
         {
@@ -64,7 +64,7 @@ public class InputController : MonoBehaviour
             buttonChild.transform.SetParent(buttonPanel.transform);
             //buttonChild.transform.localScale = Vector3.one;
             //버튼의 이미지를 타일 이미지로 변경
-            buttonChild.GetComponent<Image>().sprite = tile.Value.GetComponent<Tile>().spriteRenderer.sprite;
+            buttonChild.GetComponent<Image>().sprite = tile.Value.GetComponent<Tile>().spRenderer.sprite;
             //버튼 리스트에 추가
             tileButtons.Add(buttonChild);
         }
@@ -100,7 +100,7 @@ public class InputController : MonoBehaviour
                 {
                     Tile tempTile = hit.collider.gameObject.GetComponent<Tile>();
                     tempTile.ID = selectedTileID;
-                    tempTile.spriteRenderer.sprite = savedSprite;
+                    tempTile.spRenderer.sprite = savedSprite;
                 }
             }
         }
@@ -117,7 +117,7 @@ public class InputController : MonoBehaviour
     //온클릭 이벤트 함수
     public void ClickTile(int id)
     {
-        savedSprite = tilePrefabs[id].GetComponent<Tile>().spriteRenderer.sprite;
+        savedSprite = tilePrefabs[id].GetComponent<Tile>().spRenderer.sprite;
         selectedTile.sprite = savedSprite;
         selectedTileID = id;
         Debug.Log("해당 타일의 ID는 " + id + "입니다.");
@@ -126,9 +126,9 @@ public class InputController : MonoBehaviour
     public void UpdateCamera()
     {
         //키보드를 이용하여 카메라 조작
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
-        cameraController.SetPosition(x,y);
+        //float x = Input.GetAxisRaw("Horizontal");
+        //float y = Input.GetAxisRaw("Vertical");
+       // cameraController.SetPosition(x,y);
 
         //마우스 우클릭을 처음할 시 위치 변수를 현재 마우스 위치에 맞춰준다.
         if(Input.GetMouseButtonDown(1))
