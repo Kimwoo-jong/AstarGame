@@ -18,6 +18,8 @@ public class PlayerManager : MonoBehaviour
     Tile[,] tiles;
     private List<Tile> moveTiles;                           //움직일 수 있는 타일 리스트
 
+    private TurnControl turnControl;
+
     private void Awake()
     {
         if(instance == null)
@@ -31,28 +33,14 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(GameStart());
-    }
-    //게임을 시작하면 플레이어의 정보를 리스트에 올린다.
-    IEnumerator GameStart()
-    {
-        GameObject[] goPlayers = GameObject.FindGameObjectsWithTag("Player");
-
-        for(int i = 0; i <goPlayers.Length; ++i)
-        {
-            players.Add(goPlayers[i].GetComponent<Player>());
-        }
-
-        InitSelectPlayer();
-
-        yield return null;
-
-        ShowTile();
+        players = new List<Player>();
+        tiles = TempMap.instance.tiles;
+        turnControl = GameUIManager.instance.turnPnl.GetComponent<TurnControl>();
     }
     private void Update()
     {
-        //내턴이고 OnPlay상태에서만 먹히게
-        if (GameMgr.instance.IsPlayerTurn && GameMgr.instance.OnPlay)
+        //내 턴이면서 게임이 시작되었을 경우에만.
+        if (GameManager.instance.isPlayerTurn && GameManager.instance.isStart)
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -62,21 +50,41 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
+    public void SetStart()
+    {
+        StartCoroutine(GameStart());
+    }
+    //게임을 시작하면 플레이어의 정보를 리스트에 올린다.
+    private IEnumerator GameStart()
+    {
+        GameObject[] goPlayers = GameObject.FindGameObjectsWithTag("Player");
+
+        for (int i = 0; i < goPlayers.Length; ++i)
+        {
+            players.Add(goPlayers[i].GetComponent<Player>());
+        }
+
+        InitSelectPlayer();
+
+        yield return StartCoroutine(turnControl.MyTurn());
+
+        ShowTile();
+    }
     //SelectedPlayer 초기화시키기
     public void InitSelectPlayer()
     {
         selectPlayer = players[0];
-        GameManager.instance.OnPlay = false;
+        GameManager.instance.isStart = false;
     }
     //타일 보여주기 (매턴 첫 시작용)
     public void ShowTile()
     {
-        //스타트포인트 꺼주고
-        TempMap.instance.StartPointsOff();
+        //스타팅 포인트 안 보이도록
+        TempMap.instance.UnShowStartPoints();
 
         Tile[,] tiles = TempMap.instance.tiles;
-        GameMgr.instance.OnPlay = true;
-        moveTiles = TempMap.instance.ShowMoveableTile(tiles[selectPlayer.tileX, selectPlayer.tileY], selectPlayer.moveCount);
+        GameManager.instance.isStart = true;
+        moveTiles = TempMap.instance.ShowWalkableTile(tiles[selectPlayer.tileX, selectPlayer.tileY], selectPlayer.moveCount);
     }
     //타일 이동
     private void MoveTile()
@@ -113,8 +121,8 @@ public class PlayerManager : MonoBehaviour
                     return;
 
                 //길찾기
-                AStar.instance.SetStartEndIndex(selectPlayer.tileX, selectPlayer.tileY, tempTile.tileX, tempTile.tileY);
-                bool result = AStar.instance.FindPath();
+                Astar.instance.SetStartnTargetIndex(selectPlayer.tileX, tempTile.tileX, selectPlayer.tileY , tempTile.tileY);
+                bool result = Astar.instance.PathFinding();
 
                 //길찾기 성공했다면
                 if (result)
@@ -130,52 +138,61 @@ public class PlayerManager : MonoBehaviour
         }
     }
     //플레이어 선택 함수
-    public void SelectPlayer()
+    private void SelectPlayer()
     {
-        //ui위일때는 오브젝트들 안건들게 (panel은 raycast target 해제해주자.. 안그러면 모든화면에 다 먹통됨)
         if (EventSystem.current.IsPointerOverGameObject() == true)
+        {
             return;
+        }
 
-        //움직임 중이거나 Selected플레이어 없으면 리턴
-        if (SelectedPlayer.MoveOn == true || SelectedPlayer == null)
+        //움직임 중이거나 선택된 플레이어가 없으면 리턴
+        if (selectPlayer.isMove == true || selectPlayer == null)
+        {
             return;
+        }
 
-        mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        mousePos = Input.mousePosition;
+        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity);
 
         if (hit == false)
+        {
             return;
+        }
 
         if (hit.collider.CompareTag("WalkableTile"))
         {
-            Tile tmpTile = hit.collider.gameObject.GetComponent<Tile>();
+            Tile tile = hit.collider.gameObject.GetComponent<Tile>();
+            
             //마우스 찍은 타일에 플레이어 있으면
-            if (tmpTile.onObject == OnObject.PLAYER)
+            if (tile.onObject == OnObject.PLAYER)
             {
                 for (int i = 0; i < players.Count; i++)
                 {
-                    if (players[i].OnTileX == tmpTile.tileX && players[i].OnTileY == tmpTile.tileY)
+                    if (players[i].tileX == tile.tileX && players[i].tileY == tile.tileY)
                     {
                         //이미 턴이 끝난 플레이어면 리턴시키자
-                        if (players[i].TurnOver)
+                        if (players[i].isTurnOver)
+                        {
                             return;
+                        }
 
                         //SelectedPlayer 세팅
-                        SelectedPlayer = players[i];
+                        selectPlayer = players[i];
 
-                        //아직 움직일 수 있으면
-                        if (SelectedPlayer.CanMove == true)
+                        //움직일 수 있다면
+                        if (selectPlayer.canMove == true)
                         {
-                            canTiles.Clear();
-                            //선택된 캐릭 이동가능타일 보여주기
-                            canTiles = TempMap.instance.ShowMoveableTile(tmpTile, SelectedPlayer.MoveCount);
-                            Debug.Log(SelectedPlayer.Name);
+                            moveTiles.Clear();
+
+                            //선택된 플레이어 이동 가능 타일 보여주기
+                            moveTiles = TempMap.instance.ShowWalkableTile(tile, selectPlayer.moveCount);
+                            Debug.Log(selectPlayer.playerName);
                             break;
                         }
-                        //움직임 끝났으면
+                        //이동이 끝났다면
                         else
                         {
                             TempMap.instance.ClearTileColor();
@@ -186,14 +203,15 @@ public class PlayerManager : MonoBehaviour
         }
     }
     //공격 버튼을 눌러 범위 내의 적 클릭시 실행
-    public void AttackEnemy()
+    private void AttackEnemy()
     {
-        //어택버튼 눌른 상태가 아니거나, ui누른거면 리턴..
         if (attackOn == false || EventSystem.current.IsPointerOverGameObject() == true)
+        {
             return;
+        }
 
-        //어택가능 위치한 에너미타일
-        atkTiles = TempMap.instance.attTiles;
+        //공격이 가능한 위치에 있는 적 타일
+        atkTiles = TempMap.instance.atkTiles;
 
         mousePos = Input.mousePosition;
         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
@@ -202,15 +220,18 @@ public class PlayerManager : MonoBehaviour
         RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity);
 
         if (hit == false)
+        {
             return;
+        }
 
         if (hit.collider.CompareTag("WalkableTile"))
         {
             Tile tmpTile = hit.collider.gameObject.GetComponent<Tile>();
+            
             //공격 가능한 타일이면
             if (atkTiles.Contains(tmpTile))
             {
-                //플레이어의 에너미 세팅후 attack함수 실행
+                //플레이어의 적 세팅후 attack함수 실행
                 selectPlayer.enemy = tmpTile.OnEnemy;
                 selectPlayer.Attack();
                 //공격버튼 누른상태인거 초기화
@@ -222,46 +243,53 @@ public class PlayerManager : MonoBehaviour
     public void ResetMoveable()
     {
         attackOn = false;
+
         for (int i = 0; i < players.Count; i++)
         {
             players[i].canMove = true;
-            players[i].isTurn = false;
+            players[i].isTurnOver = false;
         }
     }
     //대기 버튼 클릭
     public void OnClickStay()
     {
-        if (GameManager.instance.IsPlayerTurn == false)
+        if (GameManager.instance.isPlayerTurn == false)
+        {
             return;
+        }
 
         //대기,공격버튼 없애기
-        UiMgr.instance.panelIngame.SetActive(false);
+        GameUIManager.instance.inGamePnl.SetActive(false);
 
         //카메라 추적 세팅
-        Camera.main.gameObject.GetComponent<CameraFollow>().IsDragging = false;
+        Camera.main.gameObject.GetComponent<CameraFollow>().isDrag = false;
 
-        //해당 캐릭터 턴오버 세팅
-        selectPlayer.isTurn = true;
+        //해당 플레이어 턴오버 세팅
+        selectPlayer.isTurnOver = true;
         //material 회색으로
         selectPlayer.transform.GetChild(0).GetComponent<SpriteRenderer>().material.color = Color.gray;
 
         //플레이어 중 턴이 오지 않은 캐릭 SelctedPlayer로 세팅
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Count; ++i)
         {
-            if (players[i].isTurn == true)
+            if (players[i].isTurnOver == true)
+            {
                 continue;
+            }
 
             selectPlayer = players[i];
             Tile[,] tiles = TempMap.instance.tiles;
-            moveTiles = TempMap.instance.ShowMoveableTile(tiles[selectPlayer.tileX, selectPlayer.tileY], selectPlayer.moveCount);
+            moveTiles = TempMap.instance.ShowWalkableTile(tiles[selectPlayer.tileX, selectPlayer.tileY], selectPlayer.moveCount);
+            
             return;
         }
+
         //전부 턴이 끝났다면
         //공격버튼 초기화
-        foreach (var p in players)
+        foreach (var player in players)
         {
-            p.isAttack = false;
-            p.transform.GetChild(0).GetComponent<SpriteRenderer>().material.color = Color.white;
+            player.isAttack = false;
+            player.transform.GetChild(0).GetComponent<SpriteRenderer>().material.color = Color.white;
         }
 
         TempMap.instance.ClearTileColor();
@@ -270,9 +298,11 @@ public class PlayerManager : MonoBehaviour
     //공격 버튼 클릭
     public void OnClickAttack()
     {
-        //무빙중, 내턴아님, 이미 공격햇음
-        if (!GameMgr.instance.IsPlayerTurn || selectPlayer.isAttack || selectPlayer.isMove)
+        //이동 중, 내 턴아님, 이미 공격 완료
+        if (!GameManager.instance.isPlayerTurn || selectPlayer.isAttack || selectPlayer.isMove)
+        {
             return;
+        }
 
         //이동 가능 타일보여주는 것과 안겹치도록
         TempMap.instance.ClearTileColor();
@@ -280,8 +310,12 @@ public class PlayerManager : MonoBehaviour
         attackOn = !attackOn;
 
         if (attackOn)
+        {
             TempMap.instance.ShowAttackTile(tiles[selectPlayer.tileX, selectPlayer.tileY], selectPlayer);
+        }
         else
+        {
             TempMap.instance.ClearTileColor();
+        }
     }
 }

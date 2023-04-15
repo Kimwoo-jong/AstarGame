@@ -6,10 +6,10 @@ using UnityEngine.UI;
 //플레이어 구분을 위한 열거형 변수
 public enum PlayerClass
 {
-    Warrior,            //전사
-    Archer,             //궁수
-    Wizard,             //법사
-    Thief               //도적
+    WARRIOR,            //전사
+    ARCHER,             //궁수
+    WIZARD,             //법사
+    LOG                 //도적
 }
 
 public class Player : MonoBehaviour
@@ -18,12 +18,12 @@ public class Player : MonoBehaviour
     private PlayerInfo info;                                //플레이어의 정보가 있는 데이터 클래스
 
     [HideInInspector] public Image hpBar;                   //플레이어 체력바
-    [HideInInspector] public Image playerFace;              //플레이어 초상화
+    [HideInInspector] public Sprite playerFace;             //플레이어 초상화
 
     public AudioClip deathSound;
     private GameObject deathEff;                            //죽을 때의 이펙트
 
-    public Player enemy { get; set; }                         //전투할 상대의 정보
+    public Player enemy { get; set; }                       //전투할 상대의 정보
 
     private List<Tile> path;                                //길찾기를 위한 타일 리스트
 
@@ -31,14 +31,14 @@ public class Player : MonoBehaviour
     public int tileX { get; set; }
     public int tileY { get; set; }
 
-    public bool isMove { get; set; }                          //이동 확인 변수
+    public bool isMove { get; set; }                         //이동 확인 변수
     private float moveSpeed = 8f;
 
     //행동을 한 후에 확인할 변수들
-    public bool canMove { get; set; }                         //이동을 한 뒤에 움직일 수 없도록
-    public bool isTurn { get; set; }                          //자신의 턴인지 확인할 변수
-    public bool isAttack { get; set; }                        //공격 여부 확인
-    public bool isAttackReady { get; set; }                 //공격 준비가 되었는지
+    public bool canMove { get; set; }                        //이동을 한 뒤에 움직일 수 없도록
+    public bool isTurnOver { get; set; }                     //자신의 턴인지 확인할 변수
+    public bool isAttack { get; set; }                       //공격 여부 확인
+    public bool isAttackReady { get; set; }                  //공격 준비가 되었는지
 
     //현재 애니메이션 체크용 int 변수
     private int hashRunUp;
@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
     private int hashRunLeft;
     private int hashRunRight;
 
-    [HideInInspector] public PlayerClass playerClass;       //클래스 상속을 위함.
+    [HideInInspector] public PlayerClass playerClass;        //클래스 상속을 위함.
 
     //플레이어의 스테이터스
     public int maxHP { get; set; }
@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
     public int def { get; set; }
     public int range { get; set; }
 
-    public int moveCount { get; set; }                       //움직일 수 있는 타일의 수
+    public int moveCount { get; set; }                        //움직일 수 있는 타일의 수
     public string playerName { get; set; }
 
     private void Awake()
@@ -63,8 +63,8 @@ public class Player : MonoBehaviour
         anim = GetComponent<Animator>();
         info = GetComponent<PlayerInfo>();
 
-        hpBar = GetComponent<Image>();
-        playerFace = GetComponent<SpriteRenderer>().sprite;
+        hpBar = transform.Find("Canvas/PnlHp/hpBar").GetComponent<Image>();
+        playerFace = transform.Find("face").GetComponent<SpriteRenderer>().sprite;
 
         deathEff = Resources.Load("Boom") as GameObject;
 
@@ -99,25 +99,25 @@ public class Player : MonoBehaviour
         tileY = tile.tileY;
 
         tile.onObject = OnObject.PLAYER;
-        tile.onObject = this;
+        tile.OnPlayer = this;
         transform.position = tile.transform.position;
     }
     //적 오브젝트 위치 세팅
     public void SetEnemyPosition(Tile tile)
     {
-        this.tag = "Player";
+        this.tag = "Enemy";
 
         tileX = tile.tileX;
         tileY = tile.tileY;
 
         tile.onObject = OnObject.ENEMY;
-        tile.onObject = this;
+        tile.OnEnemy = this;
         transform.position = tile.transform.position;
     }
     //타일 이동
     public void MoveTile()
     {
-        path;
+        path = Astar.instance.BestWayList;
         isMove = true;
         StartCoroutine(Move());
     }
@@ -140,31 +140,43 @@ public class Player : MonoBehaviour
                     savePos = transform.position;
                     currentTile = path[++index];
                 }
-                //무빙 끝. 빠져나가자
+
                 else
                 {
                     if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hashRunUp)
+                    {
                         anim.SetTrigger("stayUp");
+                    }
                     else if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hashRunDown)
+                    {
                         anim.SetTrigger("stayDown");
+                    }
                     else if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hashRunLeft)
+                    {
                         anim.SetTrigger("stayLeft");
+                    }
                     else if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hashRunRight)
+                    {
                         anim.SetTrigger("stayRight");
+                    }
 
                     isMove = false;
                     canMove = false;
 
-                    //이후 코딩은 에너미턴에만 해당
-                    if (GameMgr.instance.IsPlayerTurn == true)
+                    if (GameManager.instance.isPlayerTurn == true)
+                    {
                         yield break;
-
-                    //공격 가능상태면 공격하고
+                    }
+                    //공격 가능 상태면 공격
                     if (isAttackReady)
+                    {
                         Attack();
-                    //아니면 다음에너미 턴 가자
+                    }
+                    //아니면 다음 적의 턴으로
                     else
-                        EnemyMgr.instance.NextEnemyPlay();
+                    {
+                        EnemyManager.instance.NextEnemyPlay();
+                    }
 
                     yield break;
                 }
@@ -175,25 +187,33 @@ public class Player : MonoBehaviour
             if (dir == Vector3.up)
             {
                 if ((anim.GetCurrentAnimatorStateInfo(0).fullPathHash != hashRunUp))
+                {
                     anim.SetTrigger("runUp");
+                }
             }
             else if (dir == Vector3.down)
             {
                 if ((anim.GetCurrentAnimatorStateInfo(0).fullPathHash != hashRunDown))
+                {
                     anim.SetTrigger("runDown");
+                }
             }
             else if (dir == Vector3.left)
             {
                 if ((anim.GetCurrentAnimatorStateInfo(0).fullPathHash != hashRunLeft))
+                {
                     anim.SetTrigger("runLeft");
+                }
             }
             else if (dir == Vector3.right)
             {
                 if ((anim.GetCurrentAnimatorStateInfo(0).fullPathHash != hashRunRight))
+                {
                     anim.SetTrigger("runRight");
+                }
             }
-            transform.Translate(dir * Time.deltaTime * moveSpeed);
 
+            transform.Translate(dir * Time.deltaTime * moveSpeed);
 
             if (Mathf.Abs(Vector3.SqrMagnitude(transform.position - savePos)) >= 1f)
             {
@@ -213,23 +233,23 @@ public class Player : MonoBehaviour
     {
         //공격 시전
         isAttack = true;
-        //EnemyMgr용 공격 준비 변수 초기화
+        //Enemy Manager용 공격 준비 변수 초기화
         isAttackReady = false;
 
         //코루틴으로 전투를 진행시키고 종료까지 대기
-        yield return StartCoroutine(UiMgr.instance.BattleStart());
+        yield return StartCoroutine(GameUIManager.instance.StartBattle());
 
         //플레이어 턴이라면
-        if (GameMgr.instance.IsPlayerTurn)
+        if (GameManager.instance.isPlayerTurn)
         {
             //다음 플레이어 실행
-            PlayerMgr.instance.OnClickStay();
+            PlayerManager.instance.OnClickStay();
         }
         //적 턴이면
         else
         {
             //다음 적 실행
-            EnemyMgr.instance.NextEnemyPlay();
+            EnemyManager.instance.NextEnemyPlay();
         }
     }
     //피격시 실행되는 함수
@@ -246,7 +266,7 @@ public class Player : MonoBehaviour
         }
         //게임 내에 보이는 HP바에 연동
         hpBar.fillAmount = (float)curHP / maxHP;
-        
+
         //체력바도 체력 변수와 동일하게 초기화 진행
         if (hpBar.fillAmount <= 0f)
         {
@@ -270,6 +290,7 @@ public class Player : MonoBehaviour
                 tile.onObject = OnObject.PLAYER;
                 tile.OnPlayer = this;
                 break;
+
             case "Enemy":
                 tiles[tileX, tileY].OnEnemy = null;
 
@@ -291,10 +312,10 @@ public class Player : MonoBehaviour
             Die();
         }
     }
-
-    void Die()
+    //죽었을 시 실행되는 함수
+    private void Die()
     {
-        SoungMgr.instance.PlayEff(deathSound);
+        SoundManager.instance.PlayEffectSound(deathSound);
 
         //터지는 이펙트
         Instantiate(deathEff, transform.position, Quaternion.identity);
@@ -307,13 +328,15 @@ public class Player : MonoBehaviour
         {
             case "Player":
                 tiles[tileX, tileY].OnPlayer = null;
-                PlayerMgr.instance.players.Remove(this);
+                PlayerManager.instance.players.Remove(this);
                 break;
+
             case "Enemy":
                 tiles[tileX, tileY].OnEnemy = null;
-                EnemyMgr.instance.enemies.Remove(this);
+                EnemyManager.instance.enemies.Remove(this);
                 break;
         }
+
         Destroy(this.gameObject);
     }
 }
