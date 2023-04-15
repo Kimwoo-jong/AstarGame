@@ -30,7 +30,7 @@ public class InputController : MonoBehaviour
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
         }
@@ -40,7 +40,7 @@ public class InputController : MonoBehaviour
         //Resources/Tiles 폴더에 있는 모든 프리팹을 가져와서 저장
         GameObject[] resourceTiles = Resources.LoadAll<GameObject>("TileImage");
 
-        foreach(GameObject obj in resourceTiles)
+        foreach (GameObject obj in resourceTiles)
         {
             //Key : 타일 ID, Value : 타일 객체
             tilePrefabs.Add(tileID++, Instantiate(obj));
@@ -52,7 +52,7 @@ public class InputController : MonoBehaviour
     {
         //Dictionary<Key, value>를 foreach문에서 사용하려면
         //KeyValuePair<Key, Value> 구조체를 사용하면 된다.
-        foreach(KeyValuePair<int, GameObject> tile in tilePrefabs)
+        foreach (KeyValuePair<int, GameObject> tile in tilePrefabs)
         {
             //Tile의 ID 세팅
             tile.Value.GetComponent<Tile>().ID = tileID++;
@@ -76,10 +76,10 @@ public class InputController : MonoBehaviour
     {
         UpdateCamera();
         //마우스 좌클릭 시
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             //마우스가 UI위에 있다면 오브젝트 선택이 되지 않도록 반환
-            if(EventSystem.current.IsPointerOverGameObject() == true)
+            if (EventSystem.current.IsPointerOverGameObject() == true)
             {
                 return;
             }
@@ -93,10 +93,10 @@ public class InputController : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity);
 
-            if(hit.collider != null)
+            if (hit.collider != null)
             {
                 //선택한 타일이 존재한다면
-                if(selectedTile != null)
+                if (selectedTile != null)
                 {
                     Tile tempTile = hit.collider.gameObject.GetComponent<Tile>();
                     tempTile.ID = selectedTileID;
@@ -108,7 +108,7 @@ public class InputController : MonoBehaviour
     //타일 버튼을 클릭하면 실행되는 함수
     public void SelectTileButton()
     {
-        for(int i = 0; i < tileButtons.Count;++i)
+        for (int i = 0; i < tileButtons.Count; ++i)
         {
             Tile tile = tilePrefabs[i].GetComponent<Tile>();
             tileButtons[i].onClick.AddListener(() => ClickTile(tile.ID));
@@ -128,19 +128,19 @@ public class InputController : MonoBehaviour
         //키보드를 이용하여 카메라 조작
         //float x = Input.GetAxisRaw("Horizontal");
         //float y = Input.GetAxisRaw("Vertical");
-       // cameraController.SetPosition(x,y);
+        // cameraController.SetPosition(x,y);
 
         //마우스 우클릭을 처음할 시 위치 변수를 현재 마우스 위치에 맞춰준다.
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
             currentMousePos = previousMousePos = Input.mousePosition;
         }
         //우클릭 상태로 마우스를 움직일 경우에도 이동 가능
-        else if(Input.GetMouseButton(1))
+        else if (Input.GetMouseButton(1))
         {
             currentMousePos = Input.mousePosition;
             //현재 위치와 이전 위치가 다르다면
-            if(previousMousePos != currentMousePos)
+            if (previousMousePos != currentMousePos)
             {
                 Vector2 movePos = (previousMousePos - currentMousePos) * 0.5f;
                 cameraController.SetPosition(movePos.x, movePos.y);

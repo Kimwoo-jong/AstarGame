@@ -26,7 +26,7 @@ public class SelectPlayer : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < resources.Length; i++)
+        for (int i = 0; i < resources.Length; ++i)
         {
             players[i] = Instantiate(resources[i]);
             faces[i] = Instantiate(portraitPrefab);

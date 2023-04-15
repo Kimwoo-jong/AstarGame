@@ -56,7 +56,7 @@ public class Astar : MonoBehaviour
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
         }
@@ -106,26 +106,26 @@ public class Astar : MonoBehaviour
         init.gCost = 0;
         init.hCost = Mathf.Abs(targetTile.tileX - init.tileX) + Mathf.Abs(targetTile.tileY - init.tileY);
         init.fCost = init.gCost + init.hCost;
-        
+
         //타일의 코스트 체크 후 시작지점에 연결
         tiles[startTile.tileX, startTile.tileY] = init;
 
         openList.Add(init);
 
         //갈 수 있는 길들이 있다면
-        while(openList.Count > 0)
+        while (openList.Count > 0)
         {
             Tile tile = openList[0];
 
-            for(int i = 0; i < openList.Count; ++i)
+            for (int i = 0; i < openList.Count; ++i)
             {
-                if(openList[i].fCost < tile.fCost)
+                if (openList[i].fCost < tile.fCost)
                 {
                     tile = openList[i];
                 }
             }
             //목적지를 찾았다면 멈춤
-            if(tile.tileX == targetTile.tileX && tile.tileY == targetTile.tileY)
+            if (tile.tileX == targetTile.tileX && tile.tileY == targetTile.tileY)
             {
                 break;
             }
@@ -136,7 +136,7 @@ public class Astar : MonoBehaviour
             AddNeighbours(tile);
         }
         //길이 없을 경우
-        if(openList.Count == 0)
+        if (openList.Count == 0)
         {
             Debug.Log("갈 수 있는 길이 없습니다.");
             return false;
@@ -147,7 +147,7 @@ public class Astar : MonoBehaviour
     //타일 기준으로 주변 타일들 확인
     public void AddNeighbours(Tile currTile)
     {
-        for(int i = 0; i < directions.Length; ++ i)
+        for (int i = 0; i < directions.Length; ++i)
         {
             int tempX = currTile.tileX + directions[i].X;
             int tempY = currTile.tileY + directions[i].Y;
@@ -163,9 +163,9 @@ public class Astar : MonoBehaviour
             {
                 continue;
             }
-            
+
             //열린 목록에 없는 경우
-            if(!openList.Contains(tile))
+            if (!openList.Contains(tile))
             {
                 tile.gCost = currTile.gCost + directions[i].Weight;
                 tile.hCost = Mathf.Abs(targetTile.tileX - tile.tileX) + Mathf.Abs(targetTile.tileY - tile.tileY);
@@ -177,7 +177,7 @@ public class Astar : MonoBehaviour
             }
             //이미 열린 목록에 있을 경우
             //이전 부모의 gCost와 현재 부모의 gCost를 비교하여 작을 경우에 업데이트
-            else if(tiles[tempX, tempY].gCost > currTile.gCost + 10)
+            else if (tiles[tempX, tempY].gCost > currTile.gCost + 10)
             {
                 tile.gCost = currTile.gCost + directions[i].Weight;
                 tile.fCost = tile.gCost + tile.hCost;
@@ -190,13 +190,13 @@ public class Astar : MonoBehaviour
     {
         Tile tile = tiles[targetTile.tileX, targetTile.tileY];
 
-        while(tile != null)
+        while (tile != null)
         {
             //목적지를 리스트에 추가한 뒤
             bestWayList.Add(tile);
 
             //부모 타일을 찾아서 거슬러 올라간다.
-            if(tile.NextTile != null)
+            if (tile.NextTile != null)
             {
                 //출발지일 경우 멈춘다.
                 if (tile.NextTile.Equals(startTile))

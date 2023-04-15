@@ -145,12 +145,6 @@ public class GameUIManager : MonoBehaviour
             StartCoroutine(GameWin(false));
         }
     }
-    //UI에서의 오브젝트 생성을 위한 함수
-    private void UIInstantiate(GameObject obj, Transform parent)
-    {
-        GameObject o = Instantiate(obj);
-        o.transform.SetParent(parent, false);
-    }
     //게임의 승리 패배 확인
     public IEnumerator GameWin(bool isWin)
     {
@@ -207,7 +201,52 @@ public class GameUIManager : MonoBehaviour
         //상대의 턴
         else
         {
+            attacker = EnemyManager.instance.selectEnemy;
+            defender = EnemyManager.instance.selectEnemy.enemy;
 
+            playerFace.sprite = defender.playerFace;
+            playerAtkTxt.text = defender.atk.ToString();
+            playerDefTxt.text = defender.def.ToString();
+            playerHpTxt.text = defender.curHP.ToString();
+
+            atkFace = enemyFace;
+            atkHpBar = enemyHpBar;
+            atkHpTxt = enemyHpTxt;
+
+            //적 UI 세팅
+            enemyFace.sprite = attacker.playerFace;
+            enemyAtkTxt.text = attacker.atk.ToString();
+            enemyDefTxt.text = attacker.def.ToString();
+            enemyHpTxt.text = attacker.curHP.ToString();
+
+            defFace = playerFace;
+            defHpBar = playerHpBar;
+            defHpTxt = playerHpTxt;
         }
+        
+        UpdatePanelState();
+    }
+    //UI에서의 오브젝트 생성을 위한 함수
+    private void UIInstantiate(GameObject obj, Transform parent)
+    {
+        GameObject o = Instantiate(obj);
+        o.transform.SetParent(parent, false);
+    }
+    public void UpdatePanelState()
+    {
+        atkHpBar.fillAmount = (float)attacker.curHP / attacker.maxHP;
+        if(atkHpBar.fillAmount <= 0f)
+        {
+            atkHpBar.fillAmount = 0f;
+        }
+
+        defHpBar.fillAmount = (float)defender.curHP / defender.maxHP;
+        if(defHpBar.fillAmount <= 0f)
+        {
+            defHpBar.fillAmount = 0f;
+        }
+
+        atkHpTxt.text = attacker.curHP.ToString();
+        defHpTxt.text = defender.curHP.ToString();
     }
 }

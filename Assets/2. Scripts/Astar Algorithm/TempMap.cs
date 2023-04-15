@@ -37,13 +37,13 @@ public class TempMap : MonoBehaviour
         atkTiles = new List<Tile>();
 
         walkableTiles = new GameObject[9];
-        for (int i = 0; i < walkableTiles.Length; i++)
+        for (int i = 0; i < walkableTiles.Length; ++i)
         {
             string name = string.Format("Tiles/roadTile{0}", i + 1);
             walkableTiles[i] = Resources.Load(name) as GameObject;
         }
         waterTiles = new GameObject[4];
-        for (int i = 0; i < waterTiles.Length; i++)
+        for (int i = 0; i < waterTiles.Length; ++i)
         {
             string name = string.Format("Tiles/waterTile{0}", (i + 1) * 3);
             waterTiles[i] = Resources.Load(name) as GameObject;
@@ -182,11 +182,11 @@ public class TempMap : MonoBehaviour
     //타일 선택 후 이동이 실행되면 사각형을 표시해주는 이미지 비활성화
     public void ClearTileColor()
     {
-        for(int x = 0; x < mapWidth; ++x)
+        for (int x = 0; x < mapWidth; ++x)
         {
-            for(int y = 0; y < mapHeight; ++y)
+            for (int y = 0; y < mapHeight; ++y)
             {
-                if(tiles[x,y].Walkable == false)
+                if (tiles[x, y].Walkable == false)
                 {
                     continue;
                 }
@@ -202,15 +202,15 @@ public class TempMap : MonoBehaviour
         //초기화부터
         atkTiles.Clear();
 
-        for(int x=0; x<mapWidth;++x)
+        for (int x = 0; x < mapWidth; ++x)
         {
-            for(int y=0;y<mapHeight;++y)
+            for (int y = 0; y < mapHeight; ++y)
             {
                 //Enemy가 올라와 있는 타일
-                if(tiles[x,y].onObject == OnObject.ENEMY)
+                if (tiles[x, y].onObject == OnObject.ENEMY)
                 {
                     //사정거리 내에 있다면
-                    if(Mathf.Abs(tile.tileX - tiles[x,y].tileX) + Mathf.Abs(tile.tileY - tiles[x,y].tileY) <= player.range)
+                    if (Mathf.Abs(tile.tileX - tiles[x, y].tileX) + Mathf.Abs(tile.tileY - tiles[x, y].tileY) <= player.range)
                     {
                         tiles[x, y].transform.GetChild(2).gameObject.SetActive(true);
                         atkTiles.Add(tiles[x, y]);
@@ -224,18 +224,18 @@ public class TempMap : MonoBehaviour
     {
         moveTiles.Clear();
 
-        for(int x=0; x<mapWidth;++x)
+        for (int x = 0; x < mapWidth; ++x)
         {
-            for(int y=0;y<mapHeight;++y)
+            for (int y = 0; y < mapHeight; ++y)
             {
-                if(tiles[x,y].Walkable == false)
+                if (tiles[x, y].Walkable == false)
                 {
                     continue;
                 }
 
                 if (Mathf.Abs(tile.tileX - tiles[x, y].tileX) + Mathf.Abs(tile.tileY - tiles[x, y].tileY) == range)
                 {
-                    if(tiles[x,y].onObject == OnObject.PLAYER || tiles[x, y].onObject == OnObject.ENEMY)
+                    if (tiles[x, y].onObject == OnObject.PLAYER || tiles[x, y].onObject == OnObject.ENEMY)
                     {
                         continue;
                     }
@@ -243,7 +243,7 @@ public class TempMap : MonoBehaviour
                     Astar.instance.SetStartnTargetIndex(tile.tileX, tiles[x, y].tileX, tile.tileY, tiles[x, y].tileY);
                     bool result = Astar.instance.PathFinding();
 
-                    if(result)
+                    if (result)
                     {
                         moveTiles.Add(tiles[x, y]);
                     }

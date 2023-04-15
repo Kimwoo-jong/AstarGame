@@ -88,7 +88,7 @@ public class Player : MonoBehaviour
         def = info.def;
         range = info.Range;
         moveCount = info.movableTileCount;
-        name = info._name;
+        playerName = info._name;
     }
     //플레이어 생성 시 위치 세팅을 위한 함수
     public void SetPlayerPosition(Tile tile)

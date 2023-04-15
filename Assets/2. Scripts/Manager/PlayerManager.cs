@@ -169,7 +169,7 @@ public class PlayerManager : MonoBehaviour
             //마우스 찍은 타일에 플레이어 있으면
             if (tile.onObject == OnObject.PLAYER)
             {
-                for (int i = 0; i < players.Count; i++)
+                for (int i = 0; i < players.Count; ++i)
                 {
                     if (players[i].tileX == tile.tileX && players[i].tileY == tile.tileY)
                     {
@@ -244,7 +244,7 @@ public class PlayerManager : MonoBehaviour
     {
         attackOn = false;
 
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Count; ++i)
         {
             players[i].canMove = true;
             players[i].isTurnOver = false;

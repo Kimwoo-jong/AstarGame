@@ -706,7 +706,7 @@ GameObject:
   - component: {fileID: 222918723}
   - component: {fileID: 222918722}
   m_Layer: 5
-  m_Name: hpCount
+  m_Name: ehpCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -812,14 +812,14 @@ MonoBehaviour:
   losePnl: {fileID: 569147846}
   playerFace: {fileID: 623695297}
   playerHpBar: {fileID: 489775266}
-  playerAtkTxt: {fileID: 157449938}
-  playerDefTxt: {fileID: 1323098168}
-  playerHpTxt: {fileID: 1590277873}
+  playerAtkTxt: {fileID: 477539794}
+  playerDefTxt: {fileID: 661121625}
+  playerHpTxt: {fileID: 1904661233}
   enemyFace: {fileID: 1618348343}
   enemyHpBar: {fileID: 6399119}
-  enemyAtkTxt: {fileID: 1561853532}
-  enemyDefTxt: {fileID: 1565570709}
-  enemyHpTxt: {fileID: 195653776}
+  enemyAtkTxt: {fileID: 1948424886}
+  enemyDefTxt: {fileID: 1233721978}
+  enemyHpTxt: {fileID: 222918722}
   battleBGM: {fileID: 8300000, guid: ecebb01375e04294ba2b937b2414b2ec, type: 3}
   normalBGM: {fileID: 8300000, guid: c77558ab6a2960c4fa6981f8c9fd2605, type: 3}
   audioSlashEff: {fileID: 8300000, guid: 954430a5ce169c6499df09d9518e5fbb, type: 3}
@@ -1116,7 +1116,7 @@ GameObject:
   - component: {fileID: 477539795}
   - component: {fileID: 477539794}
   m_Layer: 5
-  m_Name: dmgCount
+  m_Name: pdmgCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1591,7 +1591,7 @@ GameObject:
   - component: {fileID: 661121626}
   - component: {fileID: 661121625}
   m_Layer: 5
-  m_Name: defCount
+  m_Name: pdefCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2407,7 +2407,7 @@ GameObject:
   - component: {fileID: 1233721979}
   - component: {fileID: 1233721978}
   m_Layer: 5
-  m_Name: defCount
+  m_Name: edefCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3394,7 +3394,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3800,7 +3800,7 @@ GameObject:
   - component: {fileID: 1904661234}
   - component: {fileID: 1904661233}
   m_Layer: 5
-  m_Name: hpCount
+  m_Name: phpCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3878,7 +3878,7 @@ GameObject:
   - component: {fileID: 1948424887}
   - component: {fileID: 1948424886}
   m_Layer: 5
-  m_Name: dmgCount
+  m_Name: edmgCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

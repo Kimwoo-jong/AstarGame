@@ -20,7 +20,7 @@ public class TileMap2D : MonoBehaviour
     [SerializeField] private TMP_InputField inputHeight;            //맵의 Heignt 크기를 얻어올 Input Field
 
     private MapData mapData;                                        //맵 데이터 저장에 사용될 데이터 클래스
-    public List<Tile> TileList {get; private set;}                  //맵에 배치된 타일 정보 저장을 위한 리스트
+    public List<Tile> TileList { get; private set; }                  //맵에 배치된 타일 정보 저장을 위한 리스트
 
     private void Awake()
     {
@@ -54,12 +54,12 @@ public class TileMap2D : MonoBehaviour
                 //생성되는 맵의 중앙이 원점이 되도록
                 Vector3 pos = new Vector3((-Width * 0.5f + 0.5f) + x, (Height * 0.5f - 0.5f) - y, 0);
 
-                tileObjects[x,y] = Instantiate(basicTile, pos, Quaternion.identity);
+                tileObjects[x, y] = Instantiate(basicTile, pos, Quaternion.identity);
                 //자기 자신을 부모로 설정
-                tileObjects[x,y].transform.SetParent(this.gameObject.transform);
-                tiles[x,y] = tileObjects[x,y].GetComponent<Tile>();
+                tileObjects[x, y].transform.SetParent(this.gameObject.transform);
+                tiles[x, y] = tileObjects[x, y].GetComponent<Tile>();
 
-                TileList.Add(tiles[x,y]);
+                TileList.Add(tiles[x, y]);
             }
         }
         mapData.mapSize.x = Width;
@@ -69,16 +69,16 @@ public class TileMap2D : MonoBehaviour
     //깔아둔 타일을 지우고 기본 이미지로 변경
     public void EraseTileMap()
     {
-        foreach(var obj in tiles)
+        foreach (var obj in tiles)
         {
             obj.spRenderer.sprite = basicSprite.sprite;
         }
     }
     public MapData GetMapData()
     {
-        for (int i=0;i<TileList.Count;++i)
+        for (int i = 0; i < TileList.Count; ++i)
         {
-            if(TileList[i].onObject != OnObject.PLAYER)
+            if (TileList[i].onObject != OnObject.PLAYER)
             {
                 mapData.mapData[i] = (int)TileList[i].onObject;
             }
@@ -88,7 +88,7 @@ public class TileMap2D : MonoBehaviour
 
                 int x = (int)TileList[i].transform.position.x;
                 int y = (int)TileList[i].transform.position.y;
-                
+
                 mapData.tileID++;
             }
         }

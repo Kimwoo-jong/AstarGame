@@ -11,7 +11,7 @@ public class DestroyObject : MonoBehaviour
 
     public void DestroyAndUpdatePanel()
     {
-        UIManager.instance.UpdatePanelState();
+        GameUIManager.instance.UpdatePanelState();
         Destroy(this.gameObject);
     }
 }

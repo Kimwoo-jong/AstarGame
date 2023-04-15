@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 public class CameraFollow : MonoBehaviour
 {
     private Vector2 prevPos = Vector2.zero;             //카메라의 이전 위치
-    private float prevDist = 0f;
 
     Vector2 targetPos = Vector2.zero;                   //카메라에 비춰질 타겟
 
@@ -95,7 +94,7 @@ public class CameraFollow : MonoBehaviour
             Camera.main.orthographicSize += deltaMagDiff * zoomSpeed * Time.deltaTime;
 
             //줌 크기 최대 최소 세팅
-            Camera.main.orthographicSize = Mathf.Min(Camera.main.orthographicSize, 5f);
+            Camera.main.orthographicSize = Mathf.Min(Camera.main.orthographicSize, 7f);
             Camera.main.orthographicSize = Mathf.Max(Camera.main.orthographicSize, 3f);
 
             MoveLimit();

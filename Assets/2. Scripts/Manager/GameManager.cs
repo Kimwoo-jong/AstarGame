@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         turnControl = GameUIManager.instance.turnPnl.GetComponent<TurnControl>();
     }
 
-    //게임 스타트 버튼 클릭시 단한번 실행될 함수
+    //게임 스타트 버튼 클릭시 한 번 실행될 함수
     public void OnClickStart()
     {
         GameObject.Find("GameCanvas").gameObject.SetActive(false);
@@ -34,6 +34,8 @@ public class GameManager : MonoBehaviour
         GameUIManager.instance.inGamePnl.SetActive(true);
 
         PlayerManager.instance.SetStart();
+        //선택이 끝난 후 카메라 시점 조절
+        Camera.main.orthographicSize = 5f;
     }
 
     public void TurnChange()
@@ -51,7 +53,7 @@ public class GameManager : MonoBehaviour
 
         isPlayerTurn = !isPlayerTurn;
 
-        //플레이어 턴이면 조작가능 세팅초기화
+        //플레이어 턴이면 조작 가능 세팅 초기화
         if (isPlayerTurn == true)
         {
             PlayerManager.instance.ResetMoveable();
