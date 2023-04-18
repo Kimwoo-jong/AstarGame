@@ -10,7 +10,7 @@ public class CameraFollow : MonoBehaviour
 
     Vector2 targetPos = Vector2.zero;                   //카메라에 비춰질 타겟
 
-    public float moveSpeed = 1.5f;                      //카메라 이동속도
+    public float moveSpeed = 1.0f;                      //카메라 이동속도
     public float zoomSpeed = 0.01f;                     //카메라 줌 속도
     private float lerpSpeed = 10f;                      //자연스럽게 변환시켜주기 위한 Lerp 속도
 
@@ -30,7 +30,7 @@ public class CameraFollow : MonoBehaviour
         int lengthY = TempMap.instance.mapHeight - 1;
 
         maxXandY = new Vector2(tiles[lengthX, 0].transform.position.x, tiles[0, lengthY].transform.position.y);
-        minXandY = new Vector2(tiles[0, 0].transform.position.x, tiles[0, 0].transform.position.y);
+        minXandY = new Vector2(tiles[0, 0].transform.position.x - 1, tiles[0, 0].transform.position.y - 1);
 
         transform.position = new Vector3((lengthX + 1) / 2, (lengthY + 1) / 2, transform.position.z);
     }
@@ -68,6 +68,7 @@ public class CameraFollow : MonoBehaviour
 
                 transform.Translate(movePos);
                 //MoveLimit();
+
                 prevPos = touch.position - touch.deltaPosition;
             }
         }
@@ -75,8 +76,8 @@ public class CameraFollow : MonoBehaviour
         //줌인 줌아웃
         else if (Input.touchCount == 2)
         {
-            Touch touchZero = Input.GetTouch(0);//첫번째 손가락 좌표
-            Touch touchOne = Input.GetTouch(1); //두번째 손가락 좌표
+            Touch touchZero = Input.GetTouch(0);                //첫번째 손가락 좌표
+            Touch touchOne = Input.GetTouch(1);                 //두번째 손가락 좌표
 
             //deltaPosition은 deltaTime과 동일하게 delta만큼 시간동안 움직인 거리
             //현재 position에서 이전 delta값 빼주면 움직이기전의 손가락 위치

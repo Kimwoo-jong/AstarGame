@@ -704,7 +704,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpBar: {fileID: 0}
   playerFace: {fileID: 0}
-  deathSound: {fileID: 8300000, guid: c77558ab6a2960c4fa6981f8c9fd2605, type: 3}
+  deathSound: {fileID: 8300000, guid: 76650c2c4ae48b848892192ef13d964c, type: 3}
   playerClass: 0
 --- !u!114 &114833817192760980
 MonoBehaviour:
