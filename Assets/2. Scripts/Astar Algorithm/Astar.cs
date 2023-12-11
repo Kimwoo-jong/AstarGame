@@ -31,7 +31,7 @@ public class Astar : MonoBehaviour
     private int mapWidth;
     private int mapHeight;
 
-    //Astar 알고맂므 사용을 위한 리스트
+    //Astar 알고리즘 사용을 위한 리스트
     private List<Tile> openList;                    //열린 리스트(갈 수 있는 길)
     private List<Tile> closeList;                   //닫힌 리스트(이미 지나온 길)
     private List<Tile> bestWayList;                 //최단 거리
